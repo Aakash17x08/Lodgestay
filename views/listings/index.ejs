@@ -1,0 +1,335 @@
+<% layout("/layouts/boilerplate") -%>
+
+  <style>
+    #filters {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .filter {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      opacity: 0;
+      cursor: pointer;
+      min-width: 80px;
+      transition: opacity 0.3s;
+      animation: slide-in 0.5s ease-in-out forwards;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Apply delay for a staggered effect */
+    .filter:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .filter:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .filter:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .filter:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    .filter:nth-child(5) {
+      animation-delay: 0.5s;
+    }
+
+    .filter:nth-child(6) {
+      animation-delay: 0.6s;
+    }
+
+    .filter:nth-child(7) {
+      animation-delay: 0.7s;
+    }
+
+    .filter:nth-child(8) {
+      animation-delay: 0.8s;
+    }
+
+    .filter:nth-child(9) {
+      animation-delay: 0.9s;
+    }
+
+    .filter:nth-child(10) {
+      animation-delay: 1s;
+    }
+
+    .tax-info {
+      display: none;
+    }
+
+    .tax-toggle {
+      border: 1px solid black;
+      border-radius: 1rem;
+      height: 3.5rem;
+      padding: 1rem;
+    }
+
+    /* Custom Card Design */
+    .custom-card {
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+      overflow: hidden;
+    }
+
+    .custom-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .custom-card-img {
+      height: 200px;
+      object-fit: cover;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+
+    .card-body {
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    .price-section {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    @keyframes slide-in {
+      from {
+        opacity: 0;
+        transform: translateX(-50px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* Responsive for small screens */
+    @media (max-width: 768px) {
+      #filters {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding: 1rem 0.5rem;
+        gap: 1.5rem;
+        align-items: center;
+        width: 100%;
+      }
+
+      .filter {
+        min-width: 60px;
+        flex: 0 0 auto;
+      }
+
+      .filter p {
+        font-size: 0.7rem;
+        margin-bottom: 0;
+      }
+
+      .tax-toggle {
+        margin-left: 2rem;
+        flex: 0 0 auto;
+        white-space: nowrap;
+        padding: 0.5rem 1rem;
+        height: auto;
+      }
+
+      /* Hide scrollbar */
+      #filters::-webkit-scrollbar {
+        display: none;
+      }
+
+      #filters {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    }
+
+    /* main card hover effect */
+    .main-card {
+      /* border: 2px solid black; */
+      border-radius: 10px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease-in-out;
+      padding: 15px;
+
+    }
+
+    .main-card:hover {
+      box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.8);
+    }
+
+    .wishlist-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: white;
+      font-size: 1.5rem;
+      text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+      transition: transform 0.2s;
+      z-index: 10;
+    }
+
+    .wishlist-btn:hover {
+      transform: scale(1.2);
+      color: #fe424d;
+    }
+
+    .fa-solid.fa-heart {
+      color: #fe424d;
+    }
+  </style>
+
+  <div id="filters">
+    <a href="/listings" class="filter">
+      <div><i class="fa-solid fa-layer-group"></i></div>
+      <p>All</p>
+    </a>
+    <a href="/listings?category=Rooms" class="filter">
+      <div><i class="fa-solid fa-bed"></i></div>
+      <p>Rooms</p>
+    </a>
+    <a href="/listings?category=Iconic Cities" class="filter">
+      <div><i class="fa-solid fa-mountain-city"></i></div>
+      <p>Iconic Cities</p>
+    </a>
+    <a href="/listings?category=Mountains" class="filter">
+      <div><i class="fa-solid fa-mountain"></i></div>
+      <p>Mountains</p>
+    </a>
+    <a href="/listings?category=Castles" class="filter">
+      <div><i class="fa-brands fa-fort-awesome"></i></div>
+      <p>Castles</p>
+    </a>
+    <a href="/listings?category=Amazing Pools" class="filter">
+      <div><i class="fa-solid fa-person-swimming"></i></div>
+      <p>Amazing Pools</p>
+    </a>
+    <a href="/listings?category=Camping" class="filter">
+      <div><i class="fa-solid fa-campground"></i></div>
+      <p>Camping</p>
+    </a>
+    <a href="/listings?category=Farms" class="filter">
+      <div><i class="fa-solid fa-cow"></i></div>
+      <p>Farms</p>
+    </a>
+    <a href="/listings?category=Arctic" class="filter">
+      <div><i class="fa-regular fa-snowflake"></i></div>
+      <p>Arctic</p>
+    </a>
+    <a href="/listings?category=Domes" class="filter">
+      <div><i class="fa-solid fa-igloo"></i></div>
+      <p>Domes</p>
+    </a>
+    <a href="/listings?category=Boats" class="filter">
+      <div><i class="fa-solid fa-ship"></i></div>
+      <p>Boats</p>
+    </a>
+    <div class="dropdown tax-toggle">
+      <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Price Range
+      </button>
+      <ul class="dropdown-menu p-3" style="min-width: 200px;">
+        <form action="/listings" method="GET">
+          <div class="mb-2">
+            <label class="form-label">Min Price</label>
+            <input type="number" name="minPrice" class="form-control" placeholder="0">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Max Price</label>
+            <input type="number" name="maxPrice" class="form-control" placeholder="50000">
+          </div>
+          <button class="btn btn-danger btn-sm w-100">Apply</button>
+        </form>
+      </ul>
+    </div>
+
+    <div class="tax-toggle">
+      <div class="form-check-reverse form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+        <label class="form-check-label" for="flexSwitchCheckDefault">Display with Taxes</label>
+      </div>
+    </div>
+  </div>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 mt-3">
+    <% for(let listing of allListings) { %>
+      <div class="card col listing-card">
+        <div class="main-card position-relative">
+          <a href="/listings/<%= listing._id %>" class="stretched-link"></a>
+          <% let imgUrl='/images/default.jpg' ; if (Array.isArray(listing.image) && listing.image.length> 0) {
+            imgUrl = listing.image[0].url;
+            } else if (listing.image && listing.image.url) {
+            imgUrl = listing.image.url;
+            }
+            %>
+            <img src="<%= imgUrl %>" class="card-img-top" alt="Listing Image" style="height: 15rem;">
+            <div class="card-body">
+              <p class="card-text">
+                <b>
+                  <%= listing.title %>
+                </b><br>
+                &#8377; <span class="price" data-original-price="<%= listing.price %>">
+                  <%= listing.price.toLocaleString("en-IN") %>
+                </span> / Night
+                <i class="tax-info"><b><small>&nbsp; (+18% GST)</small></b></i>
+              </p>
+            </div>
+            <form action="/wishlist/<%= listing._id %>" method="POST" class="wishlist-form">
+              <button class="wishlist-btn border-0 bg-transparent">
+                <i class="<%= currUser && currUser.wishlist.includes(listing._id) ? 'fa-solid' : 'fa-regular' %> fa-heart"></i>
+              </button>
+            </form>
+        </div>
+      </div>
+      <% } %>
+  </div>
+
+
+  <script>
+    let taxSwitch = document.getElementById("flexSwitchCheckDefault");
+
+    taxSwitch.addEventListener("change", () => {
+      let priceElements = document.getElementsByClassName("price");
+      let taxInfo = document.getElementsByClassName("tax-info");
+
+      for (info of taxInfo) {
+
+        if (info.style.display != "inline") {
+          info.style.display = "inline";
+        } else {
+          info.style.display = "none";
+        }
+      }
+
+      for (let priceEl of priceElements) {
+        let originalPrice = parseFloat(priceEl.dataset.originalPrice);
+        let finalPrice = originalPrice + (originalPrice * 0.18);
+
+        if (taxSwitch.checked) {
+          priceEl.innerHTML = `${finalPrice.toLocaleString("en-IN")}`;
+        } else {
+          priceEl.innerHTML = `${originalPrice.toLocaleString("en-IN")}`;
+        }
+      }
+    });
+  </script>

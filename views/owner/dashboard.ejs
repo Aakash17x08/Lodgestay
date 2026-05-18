@@ -1,0 +1,103 @@
+<% layout("/layouts/boilerplate") %>
+<style>
+    .owner-header {
+        background: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .owner-card {
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        background: white;
+    }
+    .table thead th {
+        background: #f8fafc;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        font-weight: 700;
+        color: #64748b;
+        padding: 1.25rem;
+    }
+    .badge-booking {
+        background: #dcfce7;
+        color: #166534;
+        font-weight: 700;
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+</style>
+
+<div class="owner-header shadow-sm">
+    <div class="container">
+        <h1 class="fw-bold text-dark">Host Dashboard</h1>
+        <p class="text-muted mb-0">Manage your listings and track your guests.</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row g-4">
+        <!-- My Listings -->
+        <div class="col-md-4">
+            <div class="card owner-card h-100">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3"><i class="fa-solid fa-house-user me-2 text-danger"></i>My Listings</h5>
+                    <div class="list-group list-group-flush">
+                        <% for(let listing of myListings) { %>
+                            <a href="/listings/<%= listing._id %>" class="list-group-item list-group-item-action border-0 px-0">
+                                <strong><%= listing.title %></strong>
+                                <div class="text-muted small"><%= listing.location %></div>
+                            </a>
+                        <% } %>
+                        <% if(myListings.length === 0) { %>
+                            <p class="text-muted">You haven't added any listings yet.</p>
+                            <a href="/listings/new" class="btn btn-sm btn-danger">Add New Lodge</a>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Incoming Bookings -->
+        <div class="col-md-8">
+            <div class="card owner-card">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3"><i class="fa-solid fa-calendar-check me-2 text-success"></i>Guest Bookings</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Guest</th>
+                                    <th>Lodge</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for(let booking of myBookings) { %>
+                                    <tr>
+                                        <td>
+                                            <div class="fw-bold">@<%= booking.user.username %></div>
+                                        </td>
+                                        <td><%= booking.listing ? booking.listing.title : 'Deleted' %></td>
+                                        <td><%= booking.checkIn.toDateString() %></td>
+                                        <td><%= booking.checkOut.toDateString() %></td>
+                                        <td><span class="text-success fw-bold">&#8377; <%= booking.totalPrice.toLocaleString("en-IN") %></span></td>
+                                    </tr>
+                                <% } %>
+                                <% if(myBookings.length === 0) { %>
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4 text-muted">No bookings received yet.</td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,114 @@
+<% layout("/layouts/boilerplate") %>
+<style>
+    .manage-header {
+        background: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .listing-table-card {
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .table thead th {
+        background: #f8fafc;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        font-weight: 700;
+        color: #64748b;
+        padding: 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .table tbody td {
+        padding: 1.25rem;
+        vertical-align: middle;
+        color: #334155;
+    }
+    .property-img {
+        width: 80px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    .price-tag {
+        font-weight: 700;
+        color: #10b981;
+    }
+</style>
+
+<div class="manage-header shadow-sm">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="fw-bold text-dark mb-1">Properties Inventory</h1>
+                <p class="text-muted mb-0">Monitor all site listings, pricing, and ownership details.</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="/admin/dashboard" class="btn btn-outline-dark rounded-pill">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="card listing-table-card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Lodge</th>
+                        <th>Location</th>
+                        <th>Owner</th>
+                        <th>Price</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for(let listing of allListings) { %>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <% if(listing.image && listing.image.length > 0) { %>
+                                        <img src="<%= listing.image[0].url %>" class="property-img me-3" alt="">
+                                    <% } else { %>
+                                        <div class="bg-light property-img me-3 d-flex align-items-center justify-content-center">
+                                            <i class="fa-solid fa-image text-muted"></i>
+                                        </div>
+                                    <% } %>
+                                    <div>
+                                        <div class="fw-bold"><%= listing.title %></div>
+                                        <small class="text-muted"><%= listing.category %></small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><%= listing.location %>, <%= listing.country %></td>
+                            <td>
+                                <div class="badge bg-light text-dark rounded-pill px-3">
+                                    @<%= listing.owner ? listing.owner.username : 'Deleted User' %>
+                                </div>
+                            </td>
+                            <td><span class="price-tag">&#8377; <%= listing.price.toLocaleString("en-IN") %></span></td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="/listings/<%= listing._id %>" class="btn btn-sm btn-outline-danger rounded-pill px-3">View</a>
+                                    <a href="/listings/<%= listing._id %>/edit" class="btn btn-sm btn-outline-secondary rounded-pill px-3">Edit</a>
+                                    <form action="/listings/<%= listing._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this listing?');">
+                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-2">
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

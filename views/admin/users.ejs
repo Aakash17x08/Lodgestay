@@ -1,0 +1,131 @@
+<% layout("/layouts/boilerplate") %>
+<style>
+    .manage-header {
+        background: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .user-table-card {
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .table thead th {
+        background: #f8fafc;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        font-weight: 700;
+        color: #64748b;
+        padding: 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .table tbody td {
+        padding: 1.25rem;
+        vertical-align: middle;
+        color: #334155;
+    }
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        background: #e2e8f0;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        font-weight: 700;
+    }
+    .role-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+    .role-admin { background: #fee2e2; color: #ef4444; }
+    .role-user { background: #f1f5f9; color: #475569; }
+    
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        padding: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        transition: all 0.2s;
+    }
+</style>
+
+<div class="manage-header shadow-sm">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="fw-bold text-dark mb-1">User Directory</h1>
+                <p class="text-muted mb-0">Manage platform permissions and monitor user accounts.</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="/admin/dashboard" class="btn btn-outline-dark rounded-pill">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="card user-table-card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Account</th>
+                        <th>Email Address</th>
+                        <th>Access Level</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for(let user of allUsers) { %>
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="user-avatar me-3">
+                                        <%= user.username.charAt(0).toUpperCase() %>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold">@<%= user.username %></div>
+                                        <small class="text-muted">UID: <%= user._id.toString().slice(-6) %></small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><%= user.email %></td>
+                            <td>
+                                <span class="role-badge <%= user.role === 'admin' ? 'role-admin' : 'role-user' %>">
+                                    <%= user.role.toUpperCase() %>
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <form action="/admin/users/<%= user._id %>/toggle-role" method="POST">
+                                        <button class="btn btn-sm btn-outline-danger rounded-pill px-3" <%= user.username === 'admin' ? 'disabled' : '' %>>
+                                            <%= user.role === 'admin' ? 'Demote' : 'Promote' %>
+                                        </button>
+                                    </form>
+                                    <form action="/admin/users/<%= user._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Permanently delete this user?');">
+                                        <button class="action-btn btn btn-outline-danger" <%= user.username === 'admin' ? 'disabled' : '' %>>
+                                            <i class="fa-solid fa-trash-can"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+

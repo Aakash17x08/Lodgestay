@@ -1,0 +1,634 @@
+<% layout("/layouts/boilerplate") -%>
+    <!-- Leaflet Map CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Flatpickr Datepicker CSS and JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        .tax-info {
+            display: none;
+        }
+
+
+        .cardd-body {
+            position: relative;
+            overflow: hidden;
+            /* Ensures content does not overflow */
+            word-wrap: break-word;
+            /* Ensures text wraps properly */
+        }
+
+        .starabilityy-result {
+            white-space: nowrap;
+            /* Prevents text from breaking into new lines */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            /* Adds "..." if content overflows */
+            display: flex;
+            /* Ensures proper star alignment */
+            flex-wrap: wrap;
+            /* Allows stars to wrap within the container */
+            justify-content: center;
+            /* Centers stars within the card */
+            max-width: 100%;
+            /* Ensures stars stay inside the box */
+        }
+
+        .cardd {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin: auto;
+            padding: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* main card hover effect */
+        .main-card {
+            /* border: 2px solid black; */
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease-in-out;
+            padding: 15px;
+            margin-bottom: 2rem;
+
+        }
+
+        .main-card:hover {
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.8);
+        }
+
+        @media (max-width: 576px) {
+            .cardd {
+                max-width: 90%;
+                /* Adjusts width for smaller screens */
+            }
+
+            .starabilityy-result {
+                font-size: 0.9rem;
+                /* Adjusts size to prevent overflow */
+            }
+        }
+
+        /* Payment Modal CSS Customizations */
+        .nav-pills .nav-link {
+            color: #6c757d;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .nav-pills .nav-link.active {
+            color: #fff !important;
+            background: #fe424d !important;
+            border-color: #fe424d !important;
+            box-shadow: 0 4px 10px rgba(254, 66, 77, 0.2);
+        }
+        
+        .tracking-wide {
+            letter-spacing: 0.1rem;
+        }
+    </style>
+    <div class="row mt-3">
+        <div class="col-12 col-md-8 offset-md-3">
+            <h3>
+                <%= listing.title %>
+            </h3>
+        </div>
+        <div class="card col-12 col-md-6 offset-md-3 listing-card">
+            <div class="main-card p-0 overflow-hidden">
+                <div id="listingCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <% if (Array.isArray(listing.image) && listing.image.length > 0) { %>
+                            <% listing.image.forEach((img, i) => { %>
+                                <div class="carousel-item <%= i === 0 ? 'active' : '' %>">
+                                    <img src="<%= img.url %>" class="d-block w-100" alt="Lodge Image"
+                                        style="height: 450px; object-fit: cover;">
+                                </div>
+                            <% }) %>
+                        <% } else { %>
+                            <div class="carousel-item active">
+                                <img src="/images/default.jpg" class="d-block w-100" alt="Default Image"
+                                    style="height: 450px; object-fit: cover;">
+                            </div>
+                        <% } %>
+                    </div>
+                    <% if (Array.isArray(listing.image) && listing.image.length > 1) { %>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#listingCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#listingCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                    <% } %>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <p class="card-text">Owned by <i>
+                        <%= listing.owner.username %>
+                    </i></p>
+
+                <p class="card-text">
+                    <%= listing.description %>
+                </p>
+                <p class="card-text">
+                    <%= listing.location %>
+                </p>
+                <p class="card-text">
+                    <%= listing.country %>
+                </p>
+                <p class="card-text">
+                    <span class="price" data-original-price="<%= listing.price %>">
+                        <%= listing.price.toLocaleString("en-IN") %>
+                    </span> / Night
+                    <i class="tax-info"><b><small>&nbsp; (+18% GST)</small></b></i>
+                </p>
+                <div class="tax-toggle col-12 d-flex justify-content-center align-items-center mt-3">
+                    <div class="form-check-reverse form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+                        <label class="form-check-label" for="flexSwitchCheckDefault">Click</label>
+                    </div>
+                </div>
+
+                <% if (currUser && !currUser._id.equals(listing.owner._id)) { %>
+                <hr>
+                <div class="booking-section mt-4">
+                    <h4>Book this Lodge</h4>
+                    <form action="/listings/<%= listing._id %>/bookings" method="POST" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="checkIn" class="form-label">Check-in Date</label>
+                                <input type="text" class="form-control bg-white" id="checkIn" name="booking[checkIn]" placeholder="Select Check-in Date" required readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="checkOut" class="form-label">Check-out Date</label>
+                                <input type="text" class="form-control bg-white" id="checkOut" name="booking[checkOut]" placeholder="Select Check-out Date" required readonly>
+                            </div>
+                        </div>
+                        <button class="btn btn-danger w-100 mt-2">Reserve Now</button>
+                    </form>
+                </div>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        const activeBookings = <%- JSON.stringify(activeBookings || []) %>;
+                        const disabledDates = activeBookings.map(b => ({
+                            from: new Date(b.checkIn),
+                            to: new Date(b.checkOut)
+                        }));
+
+                        const checkInPicker = flatpickr("#checkIn", {
+                            minDate: "today",
+                            dateFormat: "Y-m-d",
+                            disable: disabledDates,
+                            onChange: function(selectedDates, dateStr, instance) {
+                                checkOutPicker.set("minDate", dateStr);
+                            }
+                        });
+
+                        const checkOutPicker = flatpickr("#checkOut", {
+                            minDate: "today",
+                            dateFormat: "Y-m-d",
+                            disable: disabledDates
+                        });
+                    });
+                </script>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Leaflet Map Container -->
+        <div class="col-12 col-md-8 offset-md-3 mb-4">
+            <hr>
+            <h4 class="fw-bold mb-3"><i class="fa-solid fa-map-location-dot me-2 text-danger"></i>Where you'll be</h4>
+            <div id="map" style="height: 380px; width: 100%; border-radius: 15px; border: 1px solid #dee2e6; box-shadow: 0 4px 15px rgba(0,0,0,0.05); z-index: 1;"></div>
+        </div>
+
+        <script>
+            // Leaflet Map Initialization with Dynamic Nominatim Geocoding
+            document.addEventListener("DOMContentLoaded", function() {
+                const location = "<%= listing.location %>";
+                const country = "<%= listing.country %>";
+                const title = "<%= listing.title %>";
+                
+                // Default coordinates (New Delhi) in case geocoding fails
+                let defaultLat = 28.6139;
+                let defaultLng = 77.2090;
+                
+                const map = L.map('map').setView([defaultLat, defaultLng], 12);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                
+                const query = encodeURIComponent(`${location}, ${country}`);
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.length > 0) {
+                            const lat = parseFloat(data[0].lat);
+                            const lon = parseFloat(data[0].lon);
+                            map.setView([lat, lon], 13);
+                            
+                            const marker = L.marker([lat, lon]).addTo(map);
+                            marker.bindPopup(`<b>${title}</b><br>${location}, ${country}`).openPopup();
+                        } else {
+                            const marker = L.marker([defaultLat, defaultLng]).addTo(map);
+                            marker.bindPopup(`<b>${location}</b><br>Coordinates could not be determined.`).openPopup();
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Geocoding failed:", err);
+                        const marker = L.marker([defaultLat, defaultLng]).addTo(map);
+                        marker.bindPopup(`<b>${location}</b><br>Failed to geocode location.`).openPopup();
+                    });
+            });
+        </script>
+
+        <% if(currUser && currUser._id.equals(listing.owner._id)) {%>
+            <div class="btns mb-5 col-12 col-md-6 offset-md-3 d-flex gap-3 justify-content-center align-items-center">
+                <a href="/listings/<%= listing._id %>/edit" class="btn edit-btn text-white px-4 py-2"
+                    style="background-color:#fe424d; border: none !important; border-radius: 8px;">Edit Listing</a>
+                <form method="post" action="/listings/<%= listing._id %>?_method=DELETE" onsubmit="return confirm('Are you sure you want to delete this listing?');" class="m-0">
+                    <button class="btn btn-dark px-4 py-2" style="border-radius: 8px;">Delete Listing</button>
+                </form>
+            </div>
+        <% } %>
+
+                <div class="col-12 col-md-8 offset-md-3 mb-3">
+                    <hr />
+                    <% if(currUser) { %>
+                        <h4>Leave a review</h4>
+                        <form action="/listings/<%= listing._id %>/reviews" method="POST" class="needs-validation"
+                            novalidate>
+                            <!-- <div class="mt-3 mb-3">
+                                <label for="rating" class="form-label">Rating</label>
+                                <input type="range" min="1" max="5" name="review[rating]" id="rating"
+                                    class="form-range">  -->
+
+                            <div class="mt-3 mb-3">
+                                <label for="rating" class="form-label">Rating</label>
+                                <fieldset class="starability-slot">
+                                    <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]"
+                                        value="1" checked aria-label="No rating." />
+                                    <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                                    <label for="first-rate1" title="Terrible">1 star</label>
+                                    <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                                    <label for="first-rate2" title="Not good">2 stars</label>
+                                    <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                                    <label for="first-rate3" title="Average">3 stars</label>
+                                    <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                                    <label for="first-rate4" title="Very good">4 stars</label>
+                                    <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                                    <label for="first-rate5" title="Amazing">5 stars</label>
+                                </fieldset>
+                            </div>
+
+                            <div class="mt-3 mb-3">
+                                <label for="comment" class="form-label">Comments</label>
+                                <textarea name="review[comment]" id="comment" cols="30" rows="5" class="form-control"
+                                    required></textarea>
+                            </div>
+                            <button class="btn btn-outline-dark">Submit</button>
+                        </form>
+                        <% } %>
+
+                            <hr>
+
+
+                            <p><b>All Reviews</b></p>
+                            <div class="row row-cols-1 row-cols-md-2 g-3">
+                                <% if (listing.reviews.length===0) { %>
+                                    <div class="col-12">
+                                        <p class="text-muted">No reviews yet. Be the first to review!</p>
+                                    </div>
+                                <% } %>
+                                <% for (let review of listing.reviews) { %>
+                                    <div class="col">
+                                        <div class="card cardd h-100 w-100 m-0 p-3 shadow-sm border border-light-subtle">
+                                            <div class="card-body card-bodyy p-0">
+                                                <h5 class="card-title fw-bold mb-2">@<%= review.author.username %></h5>
+                                                <p class="starability-result card-text starabilityy-result mb-2" data-rating="<%= review.rating %>"></p>
+                                                <p class="card-text mb-3"><%= review.comment %></p>
+                                                <form action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" method="POST" class="m-0">
+                                                    <button class="btn btn-sm btn-dark px-3" style="border-radius: 6px;">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            </div>
+
+
+                </div>
+    </div>
+
+
+
+    <script>
+        let taxSwitch = document.getElementById("flexSwitchCheckDefault");
+
+        taxSwitch.addEventListener("change", () => {
+            let priceElements = document.getElementsByClassName("price");
+            let taxInfo = document.getElementsByClassName("tax-info");
+
+            for (info of taxInfo) {
+
+                if (info.style.display != "inline") {
+                    info.style.display = "inline";
+                } else {
+                    info.style.display = "none";
+                }
+            }
+
+            for (let priceEl of priceElements) {
+                let originalPrice = parseFloat(priceEl.dataset.originalPrice);
+                let finalPrice = originalPrice + (originalPrice * 0.18);
+
+                if (taxSwitch.checked) {
+                    priceEl.innerHTML = `${finalPrice.toLocaleString("en-IN")}`;
+                } else {
+                    priceEl.innerHTML = `${originalPrice.toLocaleString("en-IN")}`;
+                }
+            }
+        });
+    </script>
+
+    <!-- Beautiful Glassmorphic Payment Modal -->
+    <div class="modal fade" id="paymentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true" style="backdrop-filter: blur(8px); z-index: 1060;">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content shadow-lg border-0" style="border-radius: 20px; overflow: hidden; background: rgba(255, 255, 255, 0.95);">
+                <div class="row g-0">
+                    <!-- Left Column: Checkout Summary -->
+                    <div class="col-md-5 p-4 text-white d-flex flex-column justify-content-between" style="background: linear-gradient(135deg, #fe424d 0%, #ff6b6b 100%);">
+                        <div>
+                            <h5 class="fw-bold mb-4 text-uppercase tracking-wide" style="font-size: 0.85rem; opacity: 0.85;">Booking Details</h5>
+                            <div class="d-flex align-items-center mb-3">
+                                <% if(Array.isArray(listing.image) && listing.image.length > 0) { %>
+                                    <img src="<%= listing.image[0].url %>" class="rounded-3 shadow-sm me-3" style="width: 70px; height: 70px; object-fit: cover;" alt="">
+                                <% } %>
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-truncate" style="max-width: 150px;"><%= listing.title %></h6>
+                                    <small style="opacity: 0.8;"><%= listing.location %></small>
+                                </div>
+                            </div>
+                            
+                            <hr style="border-color: rgba(255,255,255,0.2);">
+                            
+                            <div class="mb-2 d-flex justify-content-between">
+                                <small>Nights:</small>
+                                <span class="fw-bold" id="summaryNights">0</span>
+                            </div>
+                            <div class="mb-2 d-flex justify-content-between">
+                                <small>Base Rate:</small>
+                                <span class="fw-bold" id="summaryBasePrice">&#8377; 0</span>
+                            </div>
+                            <div class="mb-2 d-flex justify-content-between">
+                                <small>GST (18%):</small>
+                                <span class="fw-bold" id="summaryTax">&#8377; 0</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-3" style="border-top: 1px dashed rgba(255,255,255,0.3);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="fs-5 fw-bold">Total:</span>
+                                <span class="fs-4 fw-bold" id="summaryTotal">&#8377; 0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column: Interactive Payment Form -->
+                    <div class="col-md-7 p-4 bg-white position-relative">
+                        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close" id="closePaymentModalBtn"></button>
+                        
+                        <h4 class="fw-bold mb-4 text-dark"><i class="fa-solid fa-shield-halved me-2 text-danger"></i>Secure Checkout</h4>
+                        
+                        <!-- Tabs for payment mode selection -->
+                        <ul class="nav nav-pills mb-4" id="pills-tab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active rounded-pill px-3 py-2 btn-sm fw-bold me-2" id="pills-card-tab" data-bs-toggle="pill" data-bs-target="#pills-card" type="button" role="tab" aria-controls="pills-card" aria-selected="true">
+                                    <i class="fa-solid fa-credit-card me-1"></i>Card
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link rounded-pill px-3 py-2 btn-sm fw-bold" id="pills-upi-tab" data-bs-toggle="pill" data-bs-target="#pills-upi" type="button" role="tab" aria-controls="pills-upi" aria-selected="false">
+                                    <i class="fa-solid fa-mobile-screen me-1"></i>UPI
+                                </button>
+                            </li>
+                        </ul>
+                        
+                        <div class="tab-content" id="pills-tabContent">
+                            <!-- Card Payment Option -->
+                            <div class="tab-pane fade show active" id="pills-card" role="tabpanel" aria-labelledby="pills-card-tab">
+                                <form id="paymentForm" class="needs-validation" novalidate>
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted fw-semibold small">Cardholder Name</label>
+                                        <input type="text" class="form-control" placeholder="John Doe" id="cardName" required>
+                                    </div>
+                                    
+                                    <div class="mb-3 position-relative">
+                                        <label class="form-label text-muted fw-semibold small">Card Number</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" placeholder="xxxx xxxx xxxx xxxx" id="cardNumber" maxlength="19" required>
+                                            <span class="input-group-text bg-white" id="cardIcon">
+                                                <i class="fa-solid fa-credit-card text-muted"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-6 mb-3">
+                                            <label class="form-label text-muted fw-semibold small">Expiry Date</label>
+                                            <input type="text" class="form-control" placeholder="MM/YY" id="cardExpiry" maxlength="5" required>
+                                        </div>
+                                        <div class="col-6 mb-3">
+                                            <label class="form-label text-muted fw-semibold small">CVV</label>
+                                            <input type="password" class="form-control" placeholder="***" id="cardCVV" maxlength="4" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-danger w-100 py-2.5 fw-bold mt-2" id="payButton">
+                                        <i class="fa-solid fa-lock me-2"></i>Pay Securely
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <!-- UPI Payment Option -->
+                            <div class="tab-pane fade" id="pills-upi" role="tabpanel" aria-labelledby="pills-upi-tab">
+                                <div class="text-center py-2">
+                                    <i class="fa-solid fa-qrcode text-danger mb-3" style="font-size: 4rem; opacity: 0.15;"></i>
+                                    <h6 class="fw-bold mb-2">Scan QR Code or Enter UPI ID</h6>
+                                    
+                                    <div class="my-3 px-4">
+                                        <input type="text" class="form-control text-center" placeholder="username@upi" id="upiId">
+                                    </div>
+                                    
+                                    <button class="btn btn-danger w-100 py-2.5 fw-bold mt-2" id="payUpiButton">
+                                        <i class="fa-solid fa-lock me-2"></i>Pay via UPI
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script to handle custom payment checkout flow -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const bookingForm = document.querySelector(".booking-section form");
+            if (!bookingForm) return;
+
+            const paymentModalElement = document.getElementById("paymentModal");
+            const paymentModal = new bootstrap.Modal(paymentModalElement);
+            
+            const checkInInput = document.getElementById("checkIn");
+            const checkOutInput = document.getElementById("checkOut");
+            const payButton = document.getElementById("payButton");
+            const payUpiButton = document.getElementById("payUpiButton");
+            const paymentForm = document.getElementById("paymentForm");
+            
+            const listingPrice = parseFloat("<%= listing.price %>");
+            
+            // Format Card Number (space groupings of 4)
+            const cardNumber = document.getElementById("cardNumber");
+            cardNumber.addEventListener("input", function(e) {
+                let value = e.target.value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
+                let formatted = "";
+                for (let i = 0; i < value.length; i++) {
+                    if (i > 0 && i % 4 === 0) formatted += " ";
+                    formatted += value[i];
+                }
+                e.target.value = formatted;
+                
+                // Dynamic Card Brand Logo Detection
+                const cardIcon = document.getElementById("cardIcon");
+                if (value.startsWith("4")) {
+                    cardIcon.innerHTML = '<i class="fa-brands fa-cc-visa text-primary fs-5"></i>';
+                } else if (value.startsWith("5")) {
+                    cardIcon.innerHTML = '<i class="fa-brands fa-cc-mastercard text-warning fs-5"></i>';
+                } else {
+                    cardIcon.innerHTML = '<i class="fa-solid fa-credit-card text-muted"></i>';
+                }
+            });
+            
+            // Format Expiry MM/YY
+            const cardExpiry = document.getElementById("cardExpiry");
+            cardExpiry.addEventListener("input", function(e) {
+                let value = e.target.value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
+                if (value.length > 2) {
+                    e.target.value = value.substring(0, 2) + "/" + value.substring(2, 4);
+                } else {
+                    e.target.value = value;
+                }
+            });
+            
+            // Intercept booking form submission
+            bookingForm.addEventListener("submit", function(e) {
+                e.preventDefault();
+                
+                // Form validation check
+                if (!bookingForm.checkValidity()) {
+                    bookingForm.classList.add("was-validated");
+                    return;
+                }
+                
+                const checkInVal = checkInInput.value;
+                const checkOutVal = checkOutInput.value;
+                
+                if (!checkInVal || !checkOutVal) {
+                    alert("Please select both check-in and check-out dates.");
+                    return;
+                }
+                
+                // Calculate pricing
+                const d1 = new Date(checkInVal);
+                const d2 = new Date(checkOutVal);
+                const diffTime = Math.abs(d2 - d1);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays <= 0) {
+                    alert("Check-out date must be after check-in date!");
+                    return;
+                }
+                
+                const basePrice = diffDays * listingPrice;
+                const tax = basePrice * 0.18;
+                const total = basePrice + tax;
+                
+                // Populate summary data fields
+                document.getElementById("summaryNights").textContent = diffDays;
+                document.getElementById("summaryBasePrice").textContent = "₹ " + basePrice.toLocaleString("en-IN");
+                document.getElementById("summaryTax").textContent = "₹ " + tax.toLocaleString("en-IN");
+                document.getElementById("summaryTotal").textContent = "₹ " + total.toLocaleString("en-IN");
+                
+                // Open visual payment modal
+                paymentModal.show();
+            });
+            
+            // Handle Card Payment processing simulation
+            paymentForm.addEventListener("submit", function(e) {
+                e.preventDefault();
+                
+                if (!paymentForm.checkValidity()) {
+                    paymentForm.classList.add("was-validated");
+                    return;
+                }
+                
+                processPayment(payButton);
+            });
+            
+            // Handle UPI Payment processing simulation
+            payUpiButton.addEventListener("click", function(e) {
+                e.preventDefault();
+                const upiInput = document.getElementById("upiId");
+                if (!upiInput.value || !upiInput.value.includes("@")) {
+                    alert("Please enter a valid UPI ID (e.g. name@upi)");
+                    return;
+                }
+                processPayment(payUpiButton);
+            });
+            
+            function processPayment(buttonElement) {
+                const originalText = buttonElement.innerHTML;
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Authorizing...';
+                
+                // Disable close modal controls during checkout
+                document.getElementById("closePaymentModalBtn").style.display = "none";
+                
+                setTimeout(() => {
+                    buttonElement.innerHTML = '<i class="fa-solid fa-circle-check me-2"></i>Payment Successful!';
+                    buttonElement.classList.remove("btn-danger");
+                    buttonElement.classList.add("btn-success");
+                    
+                    // Confetti explosion!
+                    confetti({
+                        particleCount: 150,
+                        spread: 80,
+                        origin: { y: 0.6 }
+                    });
+                    
+                    setTimeout(() => {
+                        // Close modal and submit original booking form to save to database!
+                        paymentModal.hide();
+                        bookingForm.submit();
+                    }, 1500);
+                    
+                }, 2000);
+            }
+        });
+    </script>

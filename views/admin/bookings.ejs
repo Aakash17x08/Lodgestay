@@ -1,0 +1,107 @@
+<% layout("/layouts/boilerplate") %>
+<style>
+    .manage-header {
+        background: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .booking-table-card {
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    .table thead th {
+        background: #f8fafc;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        font-weight: 700;
+        color: #64748b;
+        padding: 1.25rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .table tbody td {
+        padding: 1.25rem;
+        vertical-align: middle;
+        color: #334155;
+    }
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: #dcfce7;
+        color: #166534;
+    }
+</style>
+
+<div class="manage-header shadow-sm">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="fw-bold text-dark mb-1">Bookings Registry</h1>
+                <p class="text-muted mb-0">Overview of all guest reservations across the platform.</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <a href="/admin/dashboard" class="btn btn-outline-dark rounded-pill">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="card booking-table-card">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Guest</th>
+                        <th>Property</th>
+                        <th>Dates</th>
+                        <th>Booked On</th>
+                        <th>Total Price</th>
+                        <th>Status</th>
+                        <th class="text-end">Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% for(let booking of allBookings) { %>
+                        <tr>
+                            <td>
+                                <div class="fw-bold">@<%= booking.user ? booking.user.username : 'Deleted User' %></div>
+                                <small class="text-muted"><%= booking.user ? booking.user.email : '-' %></small>
+                            </td>
+                            <td>
+                                <div class="fw-bold"><%= booking.listing ? booking.listing.title : 'Deleted Property' %></div>
+                                <small class="text-muted"><%= booking.listing ? booking.listing.location : '-' %></small>
+                            </td>
+                            <td>
+                                <div><i class="fa-solid fa-calendar-day me-1 text-muted"></i> <%= booking.checkIn ? booking.checkIn.toDateString() : 'N/A' %></div>
+                                <div><i class="fa-solid fa-calendar-check me-1 text-muted"></i> <%= booking.checkOut ? booking.checkOut.toDateString() : 'N/A' %></div>
+                            </td>
+                            <td>
+                                <div class="fw-bold"><%= booking.createdAt ? booking.createdAt.toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'N/A' %></div>
+                            </td>
+                            <td><span class="fw-bold text-success">&#8377; <%= booking.totalPrice ? booking.totalPrice.toLocaleString("en-IN") : '0' %></span></td>
+                            <td>
+                                <span class="status-badge"><%= booking.status %></span>
+                            </td>
+                            <td class="text-end">
+                                <a href="/listings/<%= booking.listing ? booking.listing._id : '#' %>" class="btn btn-sm btn-light rounded-pill">View Property</a>
+                            </td>
+                        </tr>
+                    <% } %>
+                    <% if(allBookings.length === 0) { %>
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">No bookings found on the platform.</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
